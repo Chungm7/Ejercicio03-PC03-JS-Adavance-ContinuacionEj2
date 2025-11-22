@@ -1,0 +1,59 @@
+{
+  "alumnos": [
+    {
+      "id": "1",
+      "nombre": "Juan Pérez",
+      "email": "juan.perez@example.com",
+      "edad": 20,
+      "cursoId": 1
+    },
+    {
+      "id": "2",
+      "nombre": "María García",
+      "email": "maria.garcia@example.com",
+      "edad": 22,
+      "cursoId": 2
+    },
+    {
+      "id": "3",
+      "nombre": "Carlos López",
+      "email": "carlos.lopez@example.com",
+      "edad": 21,
+      "cursoId": 1
+    },
+    {
+      "id": 4,
+      "nombre": "Victor",
+      "email": "chungcoelhove070@gmail.com",
+      "edad": 19,
+      "cursoId": 1
+    },
+    {
+      "id": 5,
+      "nombre": "Elias",
+      "email": "groupgennesis@gmail.com",
+      "edad": 21,
+      "cursoId": 2
+    }
+  ],
+  "cursos": [
+    {
+      "id": "1",
+      "nombre": "Desarrollo Web",
+      "descripcion": "Curso de desarrollo web con React",
+      "duracion": "6 meses"
+    },
+    {
+      "id": "2",
+      "nombre": "Bases de Datos",
+      "descripcion": "Curso de bases de datos SQL y NoSQL",
+      "duracion": "4 meses"
+    },
+    {
+      "id": "3",
+      "nombre": "Python Avanzado",
+      "descripcion": "Curso avanzado de programación en Python",
+      "duracion": "5 meses"
+    }
+  ]
+}
