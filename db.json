@@ -84,6 +84,13 @@
       "cursoId": "1",
       "fechaMatricula": "2025-11-21",
       "estado": "Activo"
+    },
+    {
+      "id": "6",
+      "alumnoId": "5",
+      "cursoId": "3",
+      "fechaMatricula": "2025-11-21",
+      "estado": "Activo"
     }
   ]
 }
