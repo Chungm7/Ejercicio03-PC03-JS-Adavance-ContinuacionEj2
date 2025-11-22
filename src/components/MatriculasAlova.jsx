@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useRequest } from 'alova/client';
 import alovaInstance from '../config/alova';
 import './MatriculasAlova.css';
 
@@ -11,66 +10,59 @@ function MatriculasAlova() {
     estado: 'Activo'
   });
   const [editingId, setEditingId] = useState(null);
+  const [matriculas, setMatriculas] = useState([]);
   const [alumnos, setAlumnos] = useState([]);
   const [cursos, setCursos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Peticiones GET
-  const getMatriculas = () => alovaInstance.Get('/matriculas');
-  const getAlumnos = () => alovaInstance.Get('/alumnos');
-  const getCursos = () => alovaInstance.Get('/cursos');
-
-  // Cargar matrículas
-  const {
-    data: matriculas,
-    loading: loadingMatriculas,
-    error: errorMatriculas,
-    send: refetchMatriculas
-  } = useRequest(getMatriculas, {
-    initialData: []
-  });
-
-  // Cargar alumnos
-  const {
-    data: alumnosData,
-    loading: loadingAlumnos
-  } = useRequest(getAlumnos, {
-    initialData: []
-  });
-
-  // Cargar cursos
-  const {
-    data: cursosData,
-    loading: loadingCursos
-  } = useRequest(getCursos, {
-    initialData: []
-  });
-
-  // Actualizar estados locales cuando los datos se cargan
+  // Cargar datos iniciales
   useEffect(() => {
-    if (alumnosData) setAlumnos(alumnosData);
-  }, [alumnosData]);
+    cargarDatos();
+  }, []);
 
-  useEffect(() => {
-    if (cursosData) setCursos(cursosData);
-  }, [cursosData]);
+  const cargarDatos = async () => {
+    try {
+      setLoading(true);
+      const [matriculasRes, alumnosRes, cursosRes] = await Promise.all([
+        alovaInstance.Get('/matriculas'),
+        alovaInstance.Get('/alumnos'),
+        alovaInstance.Get('/cursos')
+      ]);
+      
+      setMatriculas(matriculasRes);
+      setAlumnos(alumnosRes);
+      setCursos(cursosRes);
+      setError(null);
+    } catch (err) {
+      console.error('Error al cargar datos:', err);
+      setError('Error al cargar los datos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Crear matrícula
-  const { loading: creating, send: createMatricula } = useRequest(
-    (data) => alovaInstance.Post('/matriculas', data),
-    { immediate: false }
-  );
+  const cargarMatriculas = async () => {
+    try {
+      const data = await alovaInstance.Get('/matriculas');
+      setMatriculas(data);
+    } catch (err) {
+      console.error('Error al cargar matrículas:', err);
+    }
+  };
 
-  // Actualizar matrícula
-  const { loading: updating, send: updateMatricula } = useRequest(
-    (id, data) => alovaInstance.Put(`/matriculas/${id}`, data),
-    { immediate: false }
-  );
-
-  // Eliminar matrícula
-  const { loading: deleting, send: deleteMatricula } = useRequest(
-    (id) => alovaInstance.Delete(`/matriculas/${id}`),
-    { immediate: false }
-  );
+  const generarNuevoId = () => {
+    if (matriculas.length === 0) return "1";
+    
+    // Convertir todos los IDs a números y encontrar el máximo
+    const ids = matriculas.map(m => {
+      const id = parseInt(m.id);
+      return isNaN(id) ? 0 : id;
+    });
+    
+    const maxId = Math.max(...ids);
+    return String(maxId + 1);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -91,12 +83,17 @@ function MatriculasAlova() {
     try {
       if (editingId) {
         // Actualizar
-        await updateMatricula(editingId, formData);
+        await alovaInstance.Put(`/matriculas/${editingId}`, formData);
         alert('Matrícula actualizada exitosamente');
         setEditingId(null);
       } else {
-        // Crear
-        await createMatricula(formData);
+        // Crear - generar ID secuencial
+        const nuevoId = generarNuevoId();
+        const nuevaMatricula = {
+          ...formData,
+          id: nuevoId
+        };
+        await alovaInstance.Post('/matriculas', nuevaMatricula);
         alert('Matrícula creada exitosamente');
       }
       
@@ -109,7 +106,7 @@ function MatriculasAlova() {
       });
       
       // Recargar matrículas
-      await refetchMatriculas();
+      await cargarMatriculas();
     } catch (error) {
       console.error('Error al guardar matrícula:', error);
       alert('Error al guardar la matrícula');
@@ -129,9 +126,9 @@ function MatriculasAlova() {
   const handleDelete = async (id) => {
     if (window.confirm('¿Está seguro de eliminar esta matrícula?')) {
       try {
-        await deleteMatricula(id);
+        await alovaInstance.Delete(`/matriculas/${id}`);
         alert('Matrícula eliminada exitosamente');
-        await refetchMatriculas();
+        await cargarMatriculas();
       } catch (error) {
         console.error('Error al eliminar matrícula:', error);
         alert('Error al eliminar la matrícula');
@@ -150,16 +147,16 @@ function MatriculasAlova() {
   };
 
   const getNombreAlumno = (alumnoId) => {
-    const alumno = alumnos.find(a => a.id === alumnoId);
+    const alumno = alumnos?.find(a => a.id === alumnoId);
     return alumno ? alumno.nombre : 'Desconocido';
   };
 
   const getNombreCurso = (cursoId) => {
-    const curso = cursos.find(c => c.id === cursoId);
+    const curso = cursos?.find(c => c.id === cursoId);
     return curso ? curso.nombre : 'Desconocido';
   };
 
-  if (loadingAlumnos || loadingCursos) {
+  if (loading) {
     return <div className="loading">Cargando datos...</div>;
   }
 
@@ -238,10 +235,9 @@ function MatriculasAlova() {
           <div className="form-buttons">
             <button 
               type="submit" 
-              disabled={creating || updating}
               className="btn-submit"
             >
-              {creating || updating ? 'Guardando...' : editingId ? 'Actualizar' : 'Crear Matrícula'}
+              {editingId ? 'Actualizar' : 'Crear Matrícula'}
             </button>
             {editingId && (
               <button 
@@ -260,13 +256,11 @@ function MatriculasAlova() {
       <div className="lista-section">
         <h2>Matrículas Registradas</h2>
         
-        {errorMatriculas && (
-          <div className="error-message">Error al cargar matrículas: {errorMatriculas.message}</div>
+        {error && (
+          <div className="error-message">Error al cargar matrículas: {error}</div>
         )}
         
-        {loadingMatriculas ? (
-          <div className="loading">Cargando matrículas...</div>
-        ) : matriculas && matriculas.length > 0 ? (
+        {matriculas && matriculas.length > 0 ? (
           <div className="matriculas-grid">
             {matriculas.map(matricula => (
               <div key={matricula.id} className="matricula-card">
@@ -294,16 +288,14 @@ function MatriculasAlova() {
                   <button 
                     onClick={() => handleEdit(matricula)}
                     className="btn-edit"
-                    disabled={deleting}
                   >
                     Editar
                   </button>
                   <button 
                     onClick={() => handleDelete(matricula.id)}
                     className="btn-delete"
-                    disabled={deleting}
                   >
-                    {deleting ? 'Eliminando...' : 'Eliminar'}
+                    Eliminar
                   </button>
                 </div>
               </div>

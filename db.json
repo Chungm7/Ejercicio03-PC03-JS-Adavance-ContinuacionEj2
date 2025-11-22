@@ -58,25 +58,32 @@
   ],
   "matriculas": [
     {
-      "id": "1",
-      "alumnoId": "1",
-      "cursoId": "1",
-      "fechaMatricula": "2025-01-15",
-      "estado": "Activo"
-    },
-    {
-      "id": "c73e",
+      "id": "2",
       "alumnoId": "1",
       "cursoId": "2",
       "fechaMatricula": "2025-11-21",
       "estado": "Activo"
     },
     {
-      "id": "c4c8",
+      "id": "3",
       "alumnoId": "4",
       "cursoId": "3",
       "fechaMatricula": "2025-11-21",
       "estado": "Completado"
+    },
+    {
+      "id": "4",
+      "alumnoId": "4",
+      "cursoId": "1",
+      "fechaMatricula": "2025-11-02",
+      "estado": "Activo"
+    },
+    {
+      "id": "5",
+      "alumnoId": "4",
+      "cursoId": "1",
+      "fechaMatricula": "2025-11-21",
+      "estado": "Activo"
     }
   ]
 }
