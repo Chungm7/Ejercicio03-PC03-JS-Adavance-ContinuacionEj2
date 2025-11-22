@@ -55,5 +55,28 @@
       "descripcion": "Curso avanzado de programación en Python",
       "duracion": "5 meses"
     }
+  ],
+  "matriculas": [
+    {
+      "id": "1",
+      "alumnoId": "1",
+      "cursoId": "1",
+      "fechaMatricula": "2025-01-15",
+      "estado": "Activo"
+    },
+    {
+      "id": "c73e",
+      "alumnoId": "1",
+      "cursoId": "2",
+      "fechaMatricula": "2025-11-21",
+      "estado": "Activo"
+    },
+    {
+      "id": "c4c8",
+      "alumnoId": "4",
+      "cursoId": "3",
+      "fechaMatricula": "2025-11-21",
+      "estado": "Completado"
+    }
   ]
 }

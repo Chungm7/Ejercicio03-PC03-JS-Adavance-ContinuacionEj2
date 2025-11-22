@@ -16,6 +16,9 @@ function Navbar() {
           <li className="navbar-item">
             <Link to="/alova" className="navbar-link">Alumnos (Alova)</Link>
           </li>
+          <li className="navbar-item">
+            <Link to="/matriculas" className="navbar-link">Matrículas</Link>
+          </li>
         </ul>
       </div>
     </nav>
